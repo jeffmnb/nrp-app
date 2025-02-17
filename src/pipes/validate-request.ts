@@ -15,7 +15,10 @@ export class ValidateDtoPipe implements PipeTransform {
       return value;
     }
     const object = plainToClass(metatype, value);
+
     const hasErrors = await validate(object);
+    console.log(hasErrors);
+
     if (hasErrors?.length) {
       const errors = hasErrors.map((err) => err.constraints);
       throw new BadRequestException(errors);

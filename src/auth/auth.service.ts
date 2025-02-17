@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -10,6 +11,9 @@ import { AuthOutput } from './auth.types';
 import { TokenService } from './token-service';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { RefreshTokenInput } from './dtos/refresh-token.dto';
+import { SignUpInput } from './dtos/signup.dto';
+import { User } from '@prisma/client';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +37,24 @@ export class AuthService {
       return { access_token, refresh_token };
     }
     throw new UnauthorizedException('please check your login credentials');
+  }
+
+  async signUp(input: SignUpInput): Promise<Partial<User>> {
+    const existUserWithEmail = await this.prismaService.user.findUnique({
+      where: { email: input?.email },
+    });
+    if (existUserWithEmail) throw new ConflictException('email already in use');
+
+    const { name, email, password } = input;
+    const hashedPass = await bcrypt.hash(password, 8);
+    return await this.prismaService.user.create({
+      data: {
+        id: uuid(),
+        email,
+        name,
+        password: hashedPass,
+      },
+    });
   }
 
   async refreshToken(input: RefreshTokenInput): Promise<AuthOutput> {

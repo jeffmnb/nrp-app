@@ -4,6 +4,7 @@ import { UnifiedRequestData } from 'src/decorators/unifield-request-data';
 import { SignInInput } from './dtos/signin.dto';
 import { AuthOutput } from './auth.types';
 import { RefreshTokenInput } from './dtos/refresh-token.dto';
+import { SignUpInput } from './dtos/signup.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +14,11 @@ export class AuthController {
   @HttpCode(200)
   signIn(@UnifiedRequestData() input: SignInInput): Promise<AuthOutput> {
     return this.authService.signIn(input);
+  }
+
+  @Post('/signup')
+  signUp(@UnifiedRequestData() input: SignUpInput) {
+    return this.authService.signUp(input);
   }
 
   @Post('refresh-token')
