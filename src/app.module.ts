@@ -11,6 +11,8 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { FilesResolver } from './files/graphql/files.resolver';
 import { FileValidationPipe } from './pipes/files-validation';
 import { join } from 'path';
+import { RedisService } from './redis/redis.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -23,11 +25,12 @@ import { join } from 'path';
         maxFiles: 5,
       },
     }),
+    RedisModule,
     UserModule,
     AuthModule,
     QuestionModule,
     FilesModule,
   ],
-  providers: [PrismaService, FilesResolver, FileValidationPipe],
+  providers: [PrismaService, FilesResolver, FileValidationPipe, RedisService],
 })
 export class AppModule {}

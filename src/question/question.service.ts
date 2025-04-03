@@ -6,10 +6,17 @@ import { EditQuestionInput } from './dtos/edit-question.dto';
 import { AnswerQuestionInput } from './dtos/answer-question.dto';
 import { CommentOnQuestionInput } from './dtos/comment-on-question.dto';
 import { ListCommentsByQuestionInput } from './dtos/list-comments-by-question.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class QuestionService {
-  constructor(private questionRepository: QuestionRepository) {}
+  private readonly CACHE_TTL = process.env.REDIS_TTL;
+  private readonly USER_CACHE_KEY = 'user:';
+
+  constructor(
+    private questionRepository: QuestionRepository,
+    private redisService: RedisService,
+  ) {}
 
   async getAllQuestions({
     userId,
@@ -18,7 +25,23 @@ export class QuestionService {
     userId: string;
     page: number;
   }) {
-    return this.questionRepository.getAllQuestions({ userId, page });
+    const cacheKey = `${this.USER_CACHE_KEY}${userId}`;
+    const cachedUser = await this.redisService.get(cacheKey);
+
+    if (cachedUser) return cachedUser;
+
+    const questionData = await this.questionRepository.getAllQuestions({
+      userId,
+      page,
+    });
+
+    await this.redisService.set(
+      cacheKey,
+      questionData,
+      parseInt(this.CACHE_TTL),
+    );
+
+    return questionData;
   }
 
   async getQuestionBySlug(input: GetQuestionBySlugInput, userId: string) {

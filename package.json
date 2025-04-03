@@ -22,6 +22,7 @@
   "dependencies": {
     "@apollo/server": "^4.11.3",
     "@aws-sdk/client-s3": "^3.750.0",
+    "@liaoliaots/nestjs-redis": "^10.0.0",
     "@nestjs/apollo": "^13.0.4",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.0",
@@ -39,6 +40,7 @@
     "graphql": "^16.10.0",
     "graphql-tools": "^9.0.18",
     "graphql-upload-minimal": "^1.6.1",
+    "ioredis": "^5.6.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
